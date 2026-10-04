@@ -31,11 +31,11 @@ export const runGrokMenu = async (
       const cwd = process.cwd();
       const home = os.homedir();
       const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
-      const devCredit = theme.dim('crafted by ') + theme.subtle('SANKET PADHYAL');
+      const devCredit = theme.dim('crafted by ') + theme.subtle('SANKET PADHYAL') + theme.dim(' · ') + theme.blue('v1');
 
       let topHeader = theme.dim(displayPath);
       const minSpace = 2;
-      const rawCredit = 'crafted by SANKET PADHYAL';
+      const rawCredit = 'crafted by SANKET PADHYAL · v1';
       const availableSpace = width - stripAnsi(displayPath).length - rawCredit.length;
       if (availableSpace >= minSpace) {
         topHeader = theme.dim(displayPath) + ' '.repeat(availableSpace) + devCredit;
