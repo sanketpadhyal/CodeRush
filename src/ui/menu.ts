@@ -1,5 +1,5 @@
 import os from 'os';
-import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth, enableBlackBackground, resetTerminalBackground } from '../theme/theme.js';
+import { theme, center, centerBlock, stripAnsi, getTerminalHeight, getTerminalWidth, enableBlackBackground, resetTerminalBackground } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
@@ -29,7 +29,14 @@ export const runGrokMenu = async (
       const cwd = process.cwd();
       const home = os.homedir();
       const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
-      const topHeader = theme.dim(displayPath);
+      const devTag = 'developer: Sanket Padhyal';
+
+      let topHeader = theme.dim(displayPath);
+      const minSpace = 2;
+      const availableSpace = width - stripAnsi(displayPath).length - stripAnsi(devTag).length;
+      if (availableSpace >= minSpace) {
+        topHeader = theme.dim(displayPath) + ' '.repeat(availableSpace) + theme.dim(devTag);
+      }
 
       const lines: string[] = [];
 
