@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import inquirer from 'inquirer';
-import { renderGrokTheme } from './ui/view.js';
+import { runGrokMenu } from './ui/menu.js';
+import { showGetStartedScreen } from './screens/get-started.screen.js';
+import { showEnvironmentScreen } from './screens/environment.screen.js';
 import { UserCommand } from './commands/user.command.js';
-import { theme } from './theme/theme.js';
 
 const program = new Command();
 const userCommand = new UserCommand();
@@ -21,55 +21,27 @@ program
   });
 
 program
-  .command('interactive')
-  .alias('i')
-  .description('Launch interactive shortcut dashboard')
+  .command('start')
+  .description('Quick onboarding and setup guide')
   .action(async () => {
-    renderGrokTheme({
-      title: 'CodeRush Interactive Console',
-      badge: 'ACTIVE SESSION',
-      subtitle: 'Select an operation to execute in your workspace',
-      instructions: [
-        'Use arrow keys to navigate options',
-        'Press Enter to select',
-      ],
-      status: 'Awaiting input...',
-      footer: 'ctrl+c  quit',
-    });
-
-    const { action } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'action',
-        message: theme.text('Select action:'),
-        choices: [
-          { name: 'Fetch User Profile', value: 'user' },
-          { name: 'Display System Banner', value: 'banner' },
-          { name: 'Exit', value: 'exit' },
-        ],
-      },
-    ]);
-
-    if (action === 'user') {
-      const { userId } = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'userId',
-          message: theme.text('Enter User ID:'),
-          default: '1',
-        },
-      ]);
-      await userCommand.fetchAndSave(userId);
-    } else if (action === 'banner') {
-      renderGrokTheme();
-    } else {
-      process.exit(0);
-    }
+    await showGetStartedScreen();
   });
 
 program
-  .action(() => {
-    renderGrokTheme();
+  .command('env')
+  .description('Launch CodeRush developer environment')
+  .action(async () => {
+    await showEnvironmentScreen();
+  });
+
+program
+  .action(async () => {
+    const selected = await runGrokMenu();
+    if (selected === 'get-started') {
+      await showGetStartedScreen();
+    } else if (selected === 'enter-env') {
+      await showEnvironmentScreen();
+    }
   });
 
 program.parse(process.argv);
