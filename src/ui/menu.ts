@@ -1,5 +1,5 @@
 import readline from 'readline';
-import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth } from '../theme/theme.js';
+import { theme, center, centerBlock, getTerminalWidth } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
@@ -18,20 +18,24 @@ export const runGrokMenu = async (
   return new Promise((resolve) => {
     let selectedIndex = 0;
     let isCleanedUp = false;
+    let renderedLineCount = 0;
 
-    process.stdout.write('\x1b[?1049h\x1b[?25l');
+    console.clear();
+    console.log('\n');
+    console.log(renderLogo());
+    console.log('\n');
+    console.log(center(theme.text(title)));
+    console.log('\n');
+
+    process.stdout.write('\x1b[?25l');
 
     const render = () => {
-      const height = getTerminalHeight();
       const width = getTerminalWidth();
 
-      const lines: string[] = [];
-
-      const logoStr = renderLogo();
-      lines.push(...logoStr.split('\n'));
-      lines.push('');
-      lines.push(center(theme.text(title), width));
-      lines.push('');
+      if (renderedLineCount > 0) {
+        readline.moveCursor(process.stdout, 0, -renderedLineCount);
+        readline.clearScreenDown(process.stdout);
+      }
 
       const menuLines: string[] = [];
 
@@ -57,25 +61,18 @@ export const runGrokMenu = async (
       });
 
       const centeredMenu = centerBlock(menuLines, width);
-      lines.push(...centeredMenu.split('\n'));
-      lines.push('');
-      lines.push(center(theme.dim('↑↓ navigate   enter select   ctrl+c quit'), width));
+      const outLines = [
+        centeredMenu,
+        '',
+        center(theme.dim('↑↓ navigate   enter select   ctrl+c quit'), width),
+      ];
 
-      const totalLines = lines.length;
-      const topPadding = Math.max(0, Math.floor((height - totalLines) / 2));
-      const paddedOutput = '\n'.repeat(topPadding) + lines.join('\n');
-
-      process.stdout.write('\x1b[2J\x1b[H');
-      process.stdout.write(paddedOutput);
+      const outText = outLines.join('\n');
+      process.stdout.write(outText + '\n');
+      renderedLineCount = outText.split('\n').length;
     };
 
     render();
-
-    const onResize = () => {
-      render();
-    };
-
-    process.stdout.on('resize', onResize);
 
     if (process.stdin.isTTY) {
       process.stdin.setRawMode(true);
@@ -107,8 +104,7 @@ export const runGrokMenu = async (
     const cleanup = () => {
       if (isCleanedUp) return;
       isCleanedUp = true;
-      process.stdout.write('\x1b[?25h\x1b[?1049l');
-      process.stdout.removeListener('resize', onResize);
+      process.stdout.write('\x1b[?25h');
       process.stdin.removeListener('data', onData);
       if (process.stdin.isTTY) {
         process.stdin.setRawMode(false);
