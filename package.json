@@ -11,7 +11,27 @@
     "build": "tsc",
     "start": "node dist/cli.js",
     "dev": "ts-node src/cli.ts",
-    "prepare": "npm run build"
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Sanket Padhyal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanketpadhyal/CodeRush.git"
+  },
+  "keywords": [
+    "coderush",
+    "cli",
+    "developer-tools",
+    "code-sharing",
+    "cloud-sync",
+    "terminal"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "boxen": "^9.0.0",

@@ -17,7 +17,7 @@ program
 program
   .command('serve')
   .alias('push')
-  .description('Serve a local code file to Firestore cloud')
+  .description('Serve a local code file to CodeRush cloud')
   .action(async () => {
     await showGetStartedScreen();
   });
