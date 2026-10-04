@@ -31,17 +31,15 @@ export const runGrokMenu = async (
       const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
       const topHeader = theme.dim(displayPath);
 
-      const isCompact = height < 24;
+      const isCompact = height < 28;
       const lines: string[] = [];
 
       const logoStr = renderLogo(isCompact ? 'compact' : 'full');
       lines.push(...logoStr.split('\n'));
-      lines.push('');
-      lines.push('');
+      if (!isCompact) lines.push('');
       lines.push(center(theme.text(title), width));
       lines.push(center(theme.dim('developer = Sanket Padhyal'), width));
-      lines.push('');
-      lines.push('');
+      if (!isCompact) lines.push('');
 
       const menuLines: string[] = [];
 
@@ -68,15 +66,14 @@ export const runGrokMenu = async (
 
       const centeredMenu = centerBlock(menuLines, width);
       lines.push(...centeredMenu.split('\n'));
-      lines.push('');
-      lines.push('');
+      if (!isCompact) lines.push('');
       lines.push(center(`${theme.boldWhite('ctrl+c')}  ${theme.muted('quit')}`, width));
 
       const totalLines = lines.length + 1;
-      const topPadding = Math.max(0, Math.floor((height - totalLines) / 2));
+      const topPadding = Math.max(0, Math.floor((height - totalLines - 1) / 2));
       const paddedOutput = topHeader + '\n' + '\n'.repeat(topPadding) + lines.join('\n');
 
-      process.stdout.write('\x1b[2J\x1b[H' + paddedOutput);
+      process.stdout.write('\x1b[3J\x1b[2J\x1b[H' + paddedOutput);
     };
 
     render();
