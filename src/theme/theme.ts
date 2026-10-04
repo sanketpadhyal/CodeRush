@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import gradient from 'gradient-string';
 
-const brandGradient = gradient(['#94A3B8', '#E2E8F0', '#00F0FF']);
+const brandGradient = gradient(['#00FFA3', '#00F0FF', '#38BDF8']);
 const cyanGradient = gradient(['#00FFA3', '#00F0FF']);
 
 export const theme = {
@@ -9,7 +9,7 @@ export const theme = {
   cyan: cyanGradient,
   white: chalk.hex('#FFFFFF'),
   boldWhite: chalk.hex('#FFFFFF').bold,
-  text: chalk.hex('#94A3B8'),
+  text: chalk.hex('#F1F5F9'),
   muted: chalk.hex('#64748B'),
   subtle: chalk.hex('#94A3B8'),
   dim: chalk.hex('#475569'),
@@ -25,6 +25,14 @@ export const setTerminalTitle = (title: string = 'coderush'): void => {
   process.stdout.write(`\x1b]0;${title}\x07`);
   process.stdout.write(`\x1b]2;${title}\x07`);
   process.stdout.write(`\x1b]633;SetProperty=TaskName=${title}\x07`);
+};
+
+export const enableBlackBackground = (): void => {
+  process.stdout.write('\x1b]11;#000000\x07');
+};
+
+export const resetTerminalBackground = (): void => {
+  process.stdout.write('\x1b]111\x07');
 };
 
 export const getTerminalWidth = (): number => {

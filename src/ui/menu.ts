@@ -1,4 +1,4 @@
-import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth } from '../theme/theme.js';
+import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth, enableBlackBackground, resetTerminalBackground } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
@@ -18,6 +18,7 @@ export const runGrokMenu = async (
     let selectedIndex = 0;
     let isCleanedUp = false;
 
+    enableBlackBackground();
     process.stdout.write('\x1b[?1049h\x1b[?25l');
 
     const render = () => {
@@ -38,7 +39,7 @@ export const runGrokMenu = async (
       options.forEach((opt, idx) => {
         const isSelected = idx === selectedIndex;
         if (isSelected) {
-          const pointer = theme.boldWhite('❯');
+          const pointer = theme.accent('❯');
           const label = theme.boldWhite(opt.label);
           menuLines.push(`${pointer}  ${label}`);
           if (opt.description) {
@@ -106,6 +107,7 @@ export const runGrokMenu = async (
     const cleanup = () => {
       if (isCleanedUp) return;
       isCleanedUp = true;
+      resetTerminalBackground();
       process.stdout.write('\x1b[?25h\x1b[?1049l');
       process.stdout.removeListener('resize', onResize);
       process.stdin.removeListener('data', onData);
