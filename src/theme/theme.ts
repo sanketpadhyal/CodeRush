@@ -9,6 +9,7 @@ export const theme = {
   cyan: cyanGradient,
   white: chalk.hex('#FFFFFF'),
   boldWhite: chalk.hex('#FFFFFF').bold,
+  title: chalk.hex('#F8FAFC').underline,
   text: chalk.hex('#F1F5F9'),
   muted: chalk.hex('#64748B'),
   subtle: chalk.hex('#94A3B8'),

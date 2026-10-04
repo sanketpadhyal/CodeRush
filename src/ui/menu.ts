@@ -47,7 +47,7 @@ export const runGrokMenu = async (
       lines.push(...logoStr.split('\n'));
       lines.push('');
       lines.push('');
-      lines.push(center(theme.text(title), width));
+      lines.push(center(theme.title(title), width));
       lines.push('');
       lines.push('');
 
