@@ -1,4 +1,5 @@
-import { theme, center, centerBlock } from '../theme/theme.js';
+import readline from 'readline';
+import { theme, center, centerBlock, getTerminalHeight } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
@@ -17,16 +18,37 @@ export const runGrokMenu = async (
 ): Promise<string> => {
   return new Promise((resolve) => {
     let selectedIndex = 0;
+    let isCleanedUp = false;
+
+    process.stdout.write('\x1b[2J\x1b[H\x1b[?25l');
 
     const render = () => {
-      console.clear();
-      console.log('\n');
-      console.log(renderLogo('braille'));
-      console.log('\n');
-      console.log(center(theme.text(title)));
-      console.log('\n');
+      const height = getTerminalHeight();
+      const compact = height < 24;
 
-      const lines: string[] = [];
+      const buffer: string[] = [];
+
+      if (!compact) {
+        buffer.push('\n');
+      }
+
+      buffer.push(renderLogo());
+
+      if (!compact) {
+        buffer.push('\n');
+      } else {
+        buffer.push('');
+      }
+
+      buffer.push(center(theme.text(title)));
+
+      if (!compact) {
+        buffer.push('\n');
+      } else {
+        buffer.push('');
+      }
+
+      const menuLines: string[] = [];
 
       options.forEach((opt, idx) => {
         const isSelected = idx === selectedIndex;
@@ -34,31 +56,47 @@ export const runGrokMenu = async (
           const pointer = theme.accent('❯');
           const icon = theme.mint(opt.icon);
           const label = theme.code(opt.label);
-          lines.push(`${pointer}  ${icon}  ${label}`);
+          menuLines.push(`${pointer}  ${icon}  ${label}`);
           if (opt.description) {
-            lines.push(`      ${theme.subtle(opt.description)}`);
+            menuLines.push(`      ${theme.subtle(opt.description)}`);
           }
         } else {
           const pointer = ' ';
           const icon = theme.muted(opt.icon);
           const label = theme.muted(opt.label);
-          lines.push(`${pointer}  ${icon}  ${label}`);
+          menuLines.push(`   ${icon}  ${label}`);
           if (opt.description) {
-            lines.push(`      ${theme.dim(opt.description)}`);
+            menuLines.push(`      ${theme.dim(opt.description)}`);
           }
         }
         if (idx < options.length - 1) {
-          lines.push('');
+          menuLines.push('');
         }
       });
 
-      console.log(centerBlock(lines));
-      console.log('\n\n');
-      console.log(center(theme.dim('↑↓ navigate   enter select   ctrl+c quit')));
-      console.log('\n');
+      buffer.push(centerBlock(menuLines));
+
+      if (!compact) {
+        buffer.push('\n\n');
+      } else {
+        buffer.push('\n');
+      }
+
+      buffer.push(center(theme.dim('↑↓ navigate   enter select   ctrl+c quit')));
+
+      process.stdout.write('\x1b[H');
+      process.stdout.write(buffer.join('\n'));
+      readline.clearScreenDown(process.stdout);
     };
 
     render();
+
+    const onResize = () => {
+      process.stdout.write('\x1b[2J\x1b[H');
+      render();
+    };
+
+    process.stdout.on('resize', onResize);
 
     if (process.stdin.isTTY) {
       process.stdin.setRawMode(true);
@@ -74,6 +112,7 @@ export const runGrokMenu = async (
 
       if (key === '\r' || key === '\n') {
         cleanup();
+        process.stdout.write('\x1b[2J\x1b[H');
         resolve(options[selectedIndex].id);
         return;
       }
@@ -88,12 +127,22 @@ export const runGrokMenu = async (
     };
 
     const cleanup = () => {
+      if (isCleanedUp) return;
+      isCleanedUp = true;
+      process.stdout.write('\x1b[?25h');
+      process.stdout.removeListener('resize', onResize);
       process.stdin.removeListener('data', onData);
       if (process.stdin.isTTY) {
         process.stdin.setRawMode(false);
       }
       process.stdin.pause();
     };
+
+    process.on('exit', cleanup);
+    process.on('SIGINT', () => {
+      cleanup();
+      process.exit(0);
+    });
 
     process.stdin.on('data', onData);
   });

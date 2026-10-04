@@ -23,6 +23,10 @@ export const getTerminalWidth = (): number => {
   return process.stdout.columns && process.stdout.columns > 20 ? process.stdout.columns : 80;
 };
 
+export const getTerminalHeight = (): number => {
+  return process.stdout.rows && process.stdout.rows > 5 ? process.stdout.rows : 24;
+};
+
 export const stripAnsi = (str: string): string => {
   return str.replace(/\u001b\[[0-9;]*[a-zA-Z]/g, '');
 };
