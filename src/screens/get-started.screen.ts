@@ -31,7 +31,6 @@ export const showGetStartedScreen = async (): Promise<void> => {
       type: 'input',
       name: 'developerName',
       message: theme.boldWhite('Enter developer name:'),
-      default: 'Sanket Padhyal',
       validate: (input: string) => input.trim().length > 0 || 'Developer name is required',
     },
     {
@@ -76,7 +75,7 @@ export const showGetStartedScreen = async (): Promise<void> => {
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let fIdx = 0;
   const spinInterval = setInterval(() => {
-    process.stdout.write(`\r${theme.accent(frames[fIdx])} ${theme.subtle('Uploading code to CodeRush cloud...')}`);
+    process.stdout.write(`\r${theme.blue(frames[fIdx])} ${theme.blue('Uploading code to CodeRush cloud...')}`);
     fIdx = (fIdx + 1) % frames.length;
   }, 60);
 
@@ -92,7 +91,6 @@ export const showGetStartedScreen = async (): Promise<void> => {
     clearInterval(spinInterval);
     process.stdout.write('\r\x1b[K');
     console.log('\n' + theme.error(`Error saving to server: ${(error as Error).message}`) + '\n');
-    console.log(theme.subtle('Ensure the backend server is running on http://localhost:5001\n'));
     await inquirer.prompt([{ type: 'input', name: 'continue', message: theme.dim('Press Enter to return...') }]);
     process.stdout.write('\x1b[?1049l');
     return;
@@ -110,14 +108,14 @@ export const showGetStartedScreen = async (): Promise<void> => {
   console.log('\n\n');
 
   const resultCard = [
-    `${theme.mint('✔')}  ${theme.code('Successfully served to Firestore!')}`,
+    `${theme.mint('✔')}  ${theme.code('Successfully served to server!')}`,
     '',
     `   ${theme.muted('File Name:')}   ${theme.boldWhite(result.fileName)}`,
     `   ${theme.muted('Developer:')}   ${theme.boldWhite(result.author || answers.developerName)}`,
-    `   ${theme.muted('Share Code:')}  ${theme.accent(result.shareCode)}`,
+    `   ${theme.muted('Share Code:')}  ${theme.darkBlue(result.shareCode)}`,
     '',
     `   ${theme.subtle('Now pull in any system you want:')}`,
-    `   ${theme.code(`coderush pull ${result.shareCode}`)}`,
+    `   ${theme.code('coderush pull')} ${theme.darkBlue(result.shareCode)}`,
   ];
 
   console.log(resultCard.map((l) => '  ' + l).join('\n'));

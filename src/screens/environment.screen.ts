@@ -45,7 +45,7 @@ export const showEnvironmentScreen = async (initialCode?: string): Promise<void>
   const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   let fIdx = 0;
   const spinInterval = setInterval(() => {
-    process.stdout.write(`\r${theme.accent(frames[fIdx])} ${theme.subtle(`Fetching snippet '${shareCode}' from cloud...`)}`);
+    process.stdout.write(`\r${theme.blue(frames[fIdx])} ${theme.blue(`Fetching snippet '${shareCode}' from cloud...`)}`);
     fIdx = (fIdx + 1) % frames.length;
   }, 60);
 
@@ -82,7 +82,7 @@ export const showEnvironmentScreen = async (initialCode?: string): Promise<void>
     `   ${theme.muted('File Name:')}   ${theme.boldWhite(snippet.fileName)}`,
     `   ${theme.muted('Author:')}      ${theme.boldWhite(snippet.author || 'Unknown')}`,
     `   ${theme.muted('Language:')}    ${theme.subtle(snippet.language)}`,
-    `   ${theme.muted('Saved To:')}    ${theme.accent(destPath)}`,
+    `   ${theme.muted('Saved To:')}    ${theme.darkBlue(destPath)}`,
   ];
 
   console.log(resultCard.map((l) => '  ' + l).join('\n'));

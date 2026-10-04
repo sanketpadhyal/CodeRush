@@ -16,6 +16,8 @@ export const theme = {
   subtle: chalk.hex('#94A3B8'),
   dim: chalk.hex('#475569'),
   accent: chalk.hex('#00F0FF').bold,
+  blue: chalk.hex('#3B82F6'),
+  darkBlue: chalk.hex('#2563EB').bold,
   code: chalk.hex('#FFFFFF').bold,
   success: chalk.hex('#10B981'),
   warning: chalk.hex('#F59E0B'),
