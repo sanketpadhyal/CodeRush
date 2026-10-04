@@ -1,3 +1,4 @@
+import os from 'os';
 import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth, enableBlackBackground, resetTerminalBackground } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
@@ -25,6 +26,11 @@ export const runGrokMenu = async (
       const height = getTerminalHeight();
       const width = getTerminalWidth();
 
+      const cwd = process.cwd();
+      const home = os.homedir();
+      const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
+      const topHeader = theme.dim(displayPath);
+
       const isCompact = height < 24;
       const lines: string[] = [];
 
@@ -33,6 +39,7 @@ export const runGrokMenu = async (
       lines.push('');
       lines.push('');
       lines.push(center(theme.text(title), width));
+      lines.push(center(theme.dim('developer = Sanket Padhyal'), width));
       lines.push('');
       lines.push('');
 
@@ -65,9 +72,9 @@ export const runGrokMenu = async (
       lines.push('');
       lines.push(center(`${theme.boldWhite('ctrl+c')}  ${theme.muted('quit')}`, width));
 
-      const totalLines = lines.length;
+      const totalLines = lines.length + 1;
       const topPadding = Math.max(0, Math.floor((height - totalLines) / 2));
-      const paddedOutput = '\n'.repeat(topPadding) + lines.join('\n');
+      const paddedOutput = topHeader + '\n' + '\n'.repeat(topPadding) + lines.join('\n');
 
       process.stdout.write('\x1b[2J\x1b[H' + paddedOutput);
     };
