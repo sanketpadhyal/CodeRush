@@ -1,6 +1,6 @@
 import os from 'os';
 import { theme, center, centerBlock, stripAnsi, getTerminalHeight, getTerminalWidth, enableBlackBackground, resetTerminalBackground } from '../theme/theme.js';
-import { renderLogo } from './logo.js';
+import { renderAnimatedLogo } from './logo.js';
 
 export interface MenuOption {
   id: string;
@@ -18,6 +18,8 @@ export const runGrokMenu = async (
   return new Promise((resolve) => {
     let selectedIndex = 0;
     let isCleanedUp = false;
+    let frame = 0;
+    let animTimer: NodeJS.Timeout | null = null;
 
     enableBlackBackground();
     process.stdout.write('\x1b[?1049h\x1b[?25l');
@@ -41,7 +43,7 @@ export const runGrokMenu = async (
 
       const lines: string[] = [];
 
-      const logoStr = renderLogo('full');
+      const logoStr = renderAnimatedLogo(frame, 'full');
       lines.push(...logoStr.split('\n'));
       lines.push('');
       lines.push('');
@@ -87,6 +89,11 @@ export const runGrokMenu = async (
 
     render();
 
+    animTimer = setInterval(() => {
+      frame++;
+      render();
+    }, 75);
+
     const onResize = () => {
       render();
     };
@@ -123,6 +130,10 @@ export const runGrokMenu = async (
     const cleanup = () => {
       if (isCleanedUp) return;
       isCleanedUp = true;
+      if (animTimer) {
+        clearInterval(animTimer);
+        animTimer = null;
+      }
       resetTerminalBackground();
       process.stdout.write('\x1b[?25h\x1b[?1049l');
       process.stdout.removeListener('resize', onResize);
