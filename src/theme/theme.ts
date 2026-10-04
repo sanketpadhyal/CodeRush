@@ -12,6 +12,7 @@ export const theme = {
   subtle: chalk.hex('#94A3B8'),
   dim: chalk.hex('#475569'),
   accent: chalk.hex('#00F0FF').bold,
+  mint: chalk.hex('#00FFA3').bold,
   code: chalk.hex('#FFFFFF').bold,
   success: chalk.hex('#10B981'),
   warning: chalk.hex('#F59E0B'),
@@ -23,7 +24,7 @@ export const getTerminalWidth = (): number => {
 };
 
 export const stripAnsi = (str: string): string => {
-  return str.replace(/\u001b\[[0-9;]*m/g, '');
+  return str.replace(/\u001b\[[0-9;]*[a-zA-Z]/g, '');
 };
 
 export const center = (text: string, width: number = getTerminalWidth()): string => {
@@ -35,4 +36,11 @@ export const center = (text: string, width: number = getTerminalWidth()): string
       return ' '.repeat(padding) + line;
     })
     .join('\n');
+};
+
+export const centerBlock = (lines: string[], width: number = getTerminalWidth()): string => {
+  const cleanLengths = lines.map((line) => stripAnsi(line).length);
+  const maxLen = Math.max(...cleanLengths, 0);
+  const margin = Math.max(0, Math.floor((width - maxLen) / 2));
+  return lines.map((line) => (line.length === 0 ? '' : ' '.repeat(margin) + line)).join('\n');
 };

@@ -1,5 +1,4 @@
-import readline from 'readline';
-import { theme, center } from '../theme/theme.js';
+import { theme, center, centerBlock } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
@@ -12,8 +11,8 @@ export interface MenuOption {
 export const runGrokMenu = async (
   title: string = 'Welcome to CodeRush environment',
   options: MenuOption[] = [
-    { id: 'get-started', icon: '✦', label: 'Get Started', description: 'Quick setup & onboarding guide' },
-    { id: 'enter-env', icon: '⬡', label: 'Enter Environment', description: 'Launch CodeRush developer workspace' },
+    { id: 'get-started', icon: '✦', label: 'Get Started', description: 'Quick onboarding & setup guide' },
+    { id: 'enter-env', icon: '◆', label: 'Enter Environment', description: 'Launch CodeRush developer workspace' },
   ]
 ): Promise<string> => {
   return new Promise((resolve) => {
@@ -27,24 +26,34 @@ export const runGrokMenu = async (
       console.log(center(theme.text(title)));
       console.log('\n');
 
-      const menuLines = options.map((opt, idx) => {
+      const lines: string[] = [];
+
+      options.forEach((opt, idx) => {
         const isSelected = idx === selectedIndex;
         if (isSelected) {
           const pointer = theme.accent('❯');
-          const icon = theme.accent(opt.icon);
+          const icon = theme.mint(opt.icon);
           const label = theme.code(opt.label);
-          const desc = opt.description ? theme.subtle(` · ${opt.description}`) : '';
-          return `${pointer}  ${icon}  ${label}${desc}`;
+          lines.push(`${pointer}  ${icon}  ${label}`);
+          if (opt.description) {
+            lines.push(`      ${theme.subtle(opt.description)}`);
+          }
+        } else {
+          const pointer = ' ';
+          const icon = theme.muted(opt.icon);
+          const label = theme.muted(opt.label);
+          lines.push(`${pointer}  ${icon}  ${label}`);
+          if (opt.description) {
+            lines.push(`      ${theme.dim(opt.description)}`);
+          }
         }
-        const pointer = ' ';
-        const icon = theme.muted(opt.icon);
-        const label = theme.muted(opt.label);
-        const desc = opt.description ? theme.dim(` · ${opt.description}`) : '';
-        return `${pointer}  ${icon}  ${label}${desc}`;
+        if (idx < options.length - 1) {
+          lines.push('');
+        }
       });
 
-      console.log(center(menuLines.join('\n')));
-      console.log('\n');
+      console.log(centerBlock(lines));
+      console.log('\n\n');
       console.log(center(theme.dim('↑↓ navigate   enter select   ctrl+c quit')));
       console.log('\n');
     };
@@ -58,7 +67,7 @@ export const runGrokMenu = async (
     process.stdin.setEncoding('utf8');
 
     const onData = (key: string) => {
-      if (key === '\u0003' || key === '\u0004') {
+      if (key === '\u0003' || key === '\u0004' || key === 'q') {
         cleanup();
         process.exit(0);
       }
