@@ -1,5 +1,4 @@
-import readline from 'readline';
-import { theme, center, centerBlock, getTerminalWidth } from '../theme/theme.js';
+import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
@@ -18,35 +17,32 @@ export const runGrokMenu = async (
   return new Promise((resolve) => {
     let selectedIndex = 0;
     let isCleanedUp = false;
-    let renderedLineCount = 0;
 
-    console.clear();
-    console.log('\n');
-    console.log(renderLogo());
-    console.log('\n');
-    console.log(center(theme.text(title)));
-    console.log('\n');
-
-    process.stdout.write('\x1b[?25l');
+    process.stdout.write('\x1b[?1049h\x1b[?25l');
 
     const render = () => {
+      const height = getTerminalHeight();
       const width = getTerminalWidth();
 
-      if (renderedLineCount > 0) {
-        readline.moveCursor(process.stdout, 0, -renderedLineCount);
-        readline.clearScreenDown(process.stdout);
-      }
+      const isCompact = height < 24;
+      const lines: string[] = [];
+
+      const logoStr = renderLogo(isCompact ? 'compact' : 'full');
+      lines.push(...logoStr.split('\n'));
+      lines.push('');
+      lines.push(center(theme.text(title), width));
+      lines.push('');
 
       const menuLines: string[] = [];
 
       options.forEach((opt, idx) => {
         const isSelected = idx === selectedIndex;
         if (isSelected) {
-          const pointer = theme.accent('❯');
-          const label = theme.code(opt.label);
+          const pointer = theme.boldWhite('❯');
+          const label = theme.boldWhite(opt.label);
           menuLines.push(`${pointer}  ${label}`);
           if (opt.description) {
-            menuLines.push(`   ${theme.subtle(opt.description)}`);
+            menuLines.push(`   ${theme.muted(opt.description)}`);
           }
         } else {
           const label = theme.muted(opt.label);
@@ -61,18 +57,24 @@ export const runGrokMenu = async (
       });
 
       const centeredMenu = centerBlock(menuLines, width);
-      const outLines = [
-        centeredMenu,
-        '',
-        center(theme.dim('↑↓ navigate   enter select   ctrl+c quit'), width),
-      ];
+      lines.push(...centeredMenu.split('\n'));
+      lines.push('');
+      lines.push(center(`${theme.boldWhite('ctrl+c')}  ${theme.muted('quit')}`, width));
 
-      const outText = outLines.join('\n');
-      process.stdout.write(outText + '\n');
-      renderedLineCount = outText.split('\n').length;
+      const totalLines = lines.length;
+      const topPadding = Math.max(0, Math.floor((height - totalLines) / 2));
+      const paddedOutput = '\n'.repeat(topPadding) + lines.join('\n');
+
+      process.stdout.write('\x1b[2J\x1b[H' + paddedOutput);
     };
 
     render();
+
+    const onResize = () => {
+      render();
+    };
+
+    process.stdout.on('resize', onResize);
 
     if (process.stdin.isTTY) {
       process.stdin.setRawMode(true);
@@ -104,7 +106,8 @@ export const runGrokMenu = async (
     const cleanup = () => {
       if (isCleanedUp) return;
       isCleanedUp = true;
-      process.stdout.write('\x1b[?25h');
+      process.stdout.write('\x1b[?25h\x1b[?1049l');
+      process.stdout.removeListener('resize', onResize);
       process.stdin.removeListener('data', onData);
       if (process.stdin.isTTY) {
         process.stdin.setRawMode(false);

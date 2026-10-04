@@ -1,31 +1,27 @@
-import { theme, center, getTerminalWidth, getTerminalHeight } from '../theme/theme.js';
+import { theme, center, getTerminalWidth } from '../theme/theme.js';
 
-const BRAILLE_ICON_FULL = [
-  '    ⣠⣤⣄        ⢀⣤⣤⣄    ',
-  ' ⣠⣴⣿⣿⣿⣿        ⢸⣿⣿⣿⣷⣦⣀ ',
-  '⢸⣿⣿⣿⣿⠿⠋        ⠛⢿⣿⣿⣿⣿⡇',
-  '⢸⣿⣿⣿⣏⠁              ⢈⣹⣿⣿⣿⡇',
-  '⠘⣿⣿⣿⣿⣿⣦⣄        ⣠⣶⣿⣿⣿⣿⡿',
-  ' ⠈⠙⠿⣿⣿⣿⣿        ⢸⣿⣿⣿⣿⠟⠋ ',
-  '    ⠈⠙⠿⠛        ⠈⠻⠟⠋    ',
+const DOTS_LOGO = [
+  "       .:::.           .:::.",
+  "    .:'  .::           ::.  `:. ",
+  "  .:'  .::'             `::.  `:. ",
+  " ::   ::'                 `::   ::",
+  " ::   ::                   ::   ::",
+  " ::   `::.               .::'   ::",
+  "  `:.  `::.             .::'  .:' ",
+  "    `:.  `::           ::'  .:' ",
+  "       `:::'           `:::'",
 ];
 
-const BRAILLE_ICON_COMPACT = [
-  '  ⢀⣤⣶⣷⡄  ⢰⣾⣶⣄⡀  ',
-  ' ⢠⣾⣿⣿⣿⠿⠃  ⠘⢿⣿⣿⣿⣷⡄ ',
-  ' ⠹⢿⣿⣿⣿⣦⡀  ⢠⣶⣿⣿⣿⡿⠃ ',
-  '   ⠉⠻⢿⡿⠃  ⠸⣿⡿⠛⠁  ',
+const COMPACT_DOTS_LOGO = [
+  "   .::.     .::. ",
+  " .:' `::   ::' `:. ",
+  " ::   ::   ::   ::",
+  "  `:.::'   `::.:' ",
 ];
 
-export const renderLogo = (forceVariant?: 'full' | 'compact' | 'braille' | 'dots'): string => {
-  const height = getTerminalHeight();
+export const renderLogo = (variant?: 'full' | 'compact' | 'braille' | 'dots'): string => {
   const width = getTerminalWidth();
-
-  let icon = BRAILLE_ICON_FULL;
-  if (forceVariant === 'compact' || (!forceVariant && (height < 22 || width < 60))) {
-    icon = BRAILLE_ICON_COMPACT;
-  }
-
-  const colored = icon.map((line) => theme.brand(line)).join('\n');
+  const icon = variant === 'compact' ? COMPACT_DOTS_LOGO : DOTS_LOGO;
+  const colored = icon.map((line) => theme.subtle(line)).join('\n');
   return center(colored, width);
 };

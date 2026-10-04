@@ -1,18 +1,19 @@
 import chalk from 'chalk';
 import gradient from 'gradient-string';
 
-const brandGradient = gradient(['#00FFA3', '#00F0FF', '#38BDF8', '#818CF8']);
+const brandGradient = gradient(['#94A3B8', '#E2E8F0', '#00F0FF']);
 const cyanGradient = gradient(['#00FFA3', '#00F0FF']);
 
 export const theme = {
   brand: brandGradient,
   cyan: cyanGradient,
-  text: chalk.hex('#F8FAFC'),
+  white: chalk.hex('#FFFFFF'),
+  boldWhite: chalk.hex('#FFFFFF').bold,
+  text: chalk.hex('#94A3B8'),
   muted: chalk.hex('#64748B'),
   subtle: chalk.hex('#94A3B8'),
   dim: chalk.hex('#475569'),
   accent: chalk.hex('#00F0FF').bold,
-  mint: chalk.hex('#00FFA3').bold,
   code: chalk.hex('#FFFFFF').bold,
   success: chalk.hex('#10B981'),
   warning: chalk.hex('#F59E0B'),
