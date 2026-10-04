@@ -31,7 +31,9 @@ export const runGrokMenu = async (
       const logoStr = renderLogo(isCompact ? 'compact' : 'full');
       lines.push(...logoStr.split('\n'));
       lines.push('');
+      lines.push('');
       lines.push(center(theme.text(title), width));
+      lines.push('');
       lines.push('');
 
       const menuLines: string[] = [];
@@ -59,6 +61,7 @@ export const runGrokMenu = async (
 
       const centeredMenu = centerBlock(menuLines, width);
       lines.push(...centeredMenu.split('\n'));
+      lines.push('');
       lines.push('');
       lines.push(center(`${theme.boldWhite('ctrl+c')}  ${theme.muted('quit')}`, width));
 
