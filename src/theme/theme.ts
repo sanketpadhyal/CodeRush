@@ -7,6 +7,7 @@ const cyanGradient = gradient(['#00FFA3', '#00F0FF']);
 export const theme = {
   brand: brandGradient,
   cyan: cyanGradient,
+  mint: chalk.hex('#00FFA3').bold,
   white: chalk.hex('#FFFFFF'),
   boldWhite: chalk.hex('#FFFFFF').bold,
   title: chalk.hex('#F8FAFC').underline,
