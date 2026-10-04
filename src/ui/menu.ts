@@ -29,13 +29,14 @@ export const runGrokMenu = async (
       const cwd = process.cwd();
       const home = os.homedir();
       const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
-      const devTag = 'developer: Sanket Padhyal';
+      const devCredit = theme.dim('crafted by ') + theme.subtle('sanket padhyal');
 
       let topHeader = theme.dim(displayPath);
       const minSpace = 2;
-      const availableSpace = width - stripAnsi(displayPath).length - stripAnsi(devTag).length;
+      const rawCredit = 'crafted by sanket padhyal';
+      const availableSpace = width - stripAnsi(displayPath).length - rawCredit.length;
       if (availableSpace >= minSpace) {
-        topHeader = theme.dim(displayPath) + ' '.repeat(availableSpace) + theme.dim(devTag);
+        topHeader = theme.dim(displayPath) + ' '.repeat(availableSpace) + devCredit;
       }
 
       const lines: string[] = [];
