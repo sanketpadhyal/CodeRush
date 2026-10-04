@@ -1,9 +1,9 @@
 import os from 'os';
 import path from 'path';
-import fs from 'fs';
 import inquirer from 'inquirer';
-import { theme, center, stripAnsi, getTerminalHeight, getTerminalWidth, enableBlackBackground } from '../theme/theme.js';
+import { theme, center, getTerminalWidth, enableBlackBackground } from '../theme/theme.js';
 import { ApiService } from '../services/api.service.js';
+import { FileTool } from '../tools/file.tool.js';
 
 const apiService = new ApiService();
 
@@ -16,7 +16,6 @@ export const showGetStartedScreen = async (): Promise<void> => {
   const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
 
   const renderHeader = () => {
-    const width = getTerminalWidth();
     process.stdout.write('\x1b[3J\x1b[2J\x1b[H');
     console.log(theme.dim(displayPath) + '\n\n');
   };
@@ -43,22 +42,33 @@ export const showGetStartedScreen = async (): Promise<void> => {
     },
   ]);
 
-  const targetPath = path.resolve(cwd, answers.filePath.trim());
-  let fileName = path.basename(targetPath);
+  let fileName = '';
   let codeContent = '';
+  let resolvedFilePath = '';
 
-  if (fs.existsSync(targetPath) && fs.statSync(targetPath).isFile()) {
-    codeContent = fs.readFileSync(targetPath, 'utf8');
-  } else {
-    const codeAnswer = await inquirer.prompt([
-      {
-        type: 'editor',
-        name: 'code',
-        message: theme.subtle(`File '${fileName}' not found on disk. Enter or paste code content:`),
-        validate: (input: string) => input.trim().length > 0 || 'Code content cannot be empty',
-      },
-    ]);
-    codeContent = codeAnswer.code;
+  try {
+    resolvedFilePath = FileTool.resolvePath(answers.filePath);
+    if (FileTool.fileExists(resolvedFilePath)) {
+      const fileData = FileTool.readFile(resolvedFilePath);
+      fileName = fileData.fileName;
+      codeContent = fileData.content;
+    } else {
+      fileName = path.basename(resolvedFilePath);
+      const codeAnswer = await inquirer.prompt([
+        {
+          type: 'editor',
+          name: 'code',
+          message: theme.subtle(`File '${fileName}' not found on disk. Enter or paste code content:`),
+          validate: (input: string) => input.trim().length > 0 || 'Code content cannot be empty',
+        },
+      ]);
+      codeContent = codeAnswer.code;
+    }
+  } catch (err) {
+    console.log('\n' + theme.error(`File Read Error: ${(err as Error).message}`) + '\n');
+    await inquirer.prompt([{ type: 'input', name: 'continue', message: theme.dim('Press Enter to return...') }]);
+    process.stdout.write('\x1b[?1049l');
+    return;
   }
 
   process.stdout.write('\x1b[?25l');
@@ -82,6 +92,7 @@ export const showGetStartedScreen = async (): Promise<void> => {
     clearInterval(spinInterval);
     process.stdout.write('\r\x1b[K');
     console.log('\n' + theme.error(`Error saving to server: ${(error as Error).message}`) + '\n');
+    console.log(theme.subtle('Ensure the backend server is running on http://localhost:5001\n'));
     await inquirer.prompt([{ type: 'input', name: 'continue', message: theme.dim('Press Enter to return...') }]);
     process.stdout.write('\x1b[?1049l');
     return;
@@ -98,7 +109,6 @@ export const showGetStartedScreen = async (): Promise<void> => {
 
   console.log('\n\n');
 
-  const width = getTerminalWidth();
   const resultCard = [
     `${theme.mint('✔')}  ${theme.code('Successfully served to Firestore!')}`,
     '',
