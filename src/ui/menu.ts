@@ -10,8 +10,8 @@ export interface MenuOption {
 export const runGrokMenu = async (
   title: string = 'Welcome to CodeRush environment',
   options: MenuOption[] = [
-    { id: 'get-started', label: 'Get Started', description: 'Quick onboarding & setup guide' },
-    { id: 'enter-env', label: 'Enter Environment', description: 'Launch CodeRush developer workspace' },
+    { id: 'get-started', label: 'Get Started', description: 'Make your code served' },
+    { id: 'enter-env', label: 'Enter Environment', description: 'Obtain code files directly' },
   ]
 ): Promise<string> => {
   return new Promise((resolve) => {
