@@ -31,15 +31,15 @@ export const runGrokMenu = async (
       const displayPath = cwd.startsWith(home) ? '~' + cwd.slice(home.length) : cwd;
       const topHeader = theme.dim(displayPath);
 
-      const isCompact = height < 28;
       const lines: string[] = [];
 
-      const logoStr = renderLogo(isCompact ? 'compact' : 'full');
+      const logoStr = renderLogo('full');
       lines.push(...logoStr.split('\n'));
-      if (!isCompact) lines.push('');
+      lines.push('');
+      lines.push('');
       lines.push(center(theme.text(title), width));
-      lines.push(center(theme.dim('developer = Sanket Padhyal'), width));
-      if (!isCompact) lines.push('');
+      lines.push('');
+      lines.push('');
 
       const menuLines: string[] = [];
 
@@ -66,7 +66,8 @@ export const runGrokMenu = async (
 
       const centeredMenu = centerBlock(menuLines, width);
       lines.push(...centeredMenu.split('\n'));
-      if (!isCompact) lines.push('');
+      lines.push('');
+      lines.push('');
       lines.push(center(`${theme.boldWhite('ctrl+c')}  ${theme.muted('quit')}`, width));
 
       const totalLines = lines.length + 1;
