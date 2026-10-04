@@ -1,52 +1,37 @@
 import readline from 'readline';
-import { theme, center, centerBlock, getTerminalHeight } from '../theme/theme.js';
+import { theme, center, centerBlock, getTerminalHeight, getTerminalWidth } from '../theme/theme.js';
 import { renderLogo } from './logo.js';
 
 export interface MenuOption {
   id: string;
   label: string;
-  icon: string;
   description?: string;
 }
 
 export const runGrokMenu = async (
   title: string = 'Welcome to CodeRush environment',
   options: MenuOption[] = [
-    { id: 'get-started', icon: '✦', label: 'Get Started', description: 'Quick onboarding & setup guide' },
-    { id: 'enter-env', icon: '◆', label: 'Enter Environment', description: 'Launch CodeRush developer workspace' },
+    { id: 'get-started', label: 'Get Started', description: 'Quick onboarding & setup guide' },
+    { id: 'enter-env', label: 'Enter Environment', description: 'Launch CodeRush developer workspace' },
   ]
 ): Promise<string> => {
   return new Promise((resolve) => {
     let selectedIndex = 0;
     let isCleanedUp = false;
 
-    process.stdout.write('\x1b[2J\x1b[H\x1b[?25l');
+    process.stdout.write('\x1b[?1049h\x1b[?25l');
 
     const render = () => {
       const height = getTerminalHeight();
-      const compact = height < 24;
+      const width = getTerminalWidth();
 
-      const buffer: string[] = [];
+      const lines: string[] = [];
 
-      if (!compact) {
-        buffer.push('\n');
-      }
-
-      buffer.push(renderLogo());
-
-      if (!compact) {
-        buffer.push('\n');
-      } else {
-        buffer.push('');
-      }
-
-      buffer.push(center(theme.text(title)));
-
-      if (!compact) {
-        buffer.push('\n');
-      } else {
-        buffer.push('');
-      }
+      const logoStr = renderLogo();
+      lines.push(...logoStr.split('\n'));
+      lines.push('');
+      lines.push(center(theme.text(title), width));
+      lines.push('');
 
       const menuLines: string[] = [];
 
@@ -54,19 +39,16 @@ export const runGrokMenu = async (
         const isSelected = idx === selectedIndex;
         if (isSelected) {
           const pointer = theme.accent('❯');
-          const icon = theme.mint(opt.icon);
           const label = theme.code(opt.label);
-          menuLines.push(`${pointer}  ${icon}  ${label}`);
+          menuLines.push(`${pointer}  ${label}`);
           if (opt.description) {
-            menuLines.push(`      ${theme.subtle(opt.description)}`);
+            menuLines.push(`   ${theme.subtle(opt.description)}`);
           }
         } else {
-          const pointer = ' ';
-          const icon = theme.muted(opt.icon);
           const label = theme.muted(opt.label);
-          menuLines.push(`   ${icon}  ${label}`);
+          menuLines.push(`   ${label}`);
           if (opt.description) {
-            menuLines.push(`      ${theme.dim(opt.description)}`);
+            menuLines.push(`   ${theme.dim(opt.description)}`);
           }
         }
         if (idx < options.length - 1) {
@@ -74,25 +56,22 @@ export const runGrokMenu = async (
         }
       });
 
-      buffer.push(centerBlock(menuLines));
+      const centeredMenu = centerBlock(menuLines, width);
+      lines.push(...centeredMenu.split('\n'));
+      lines.push('');
+      lines.push(center(theme.dim('↑↓ navigate   enter select   ctrl+c quit'), width));
 
-      if (!compact) {
-        buffer.push('\n\n');
-      } else {
-        buffer.push('\n');
-      }
+      const totalLines = lines.length;
+      const topPadding = Math.max(0, Math.floor((height - totalLines) / 2));
+      const paddedOutput = '\n'.repeat(topPadding) + lines.join('\n');
 
-      buffer.push(center(theme.dim('↑↓ navigate   enter select   ctrl+c quit')));
-
-      process.stdout.write('\x1b[H');
-      process.stdout.write(buffer.join('\n'));
-      readline.clearScreenDown(process.stdout);
+      process.stdout.write('\x1b[2J\x1b[H');
+      process.stdout.write(paddedOutput);
     };
 
     render();
 
     const onResize = () => {
-      process.stdout.write('\x1b[2J\x1b[H');
       render();
     };
 
@@ -112,7 +91,6 @@ export const runGrokMenu = async (
 
       if (key === '\r' || key === '\n') {
         cleanup();
-        process.stdout.write('\x1b[2J\x1b[H');
         resolve(options[selectedIndex].id);
         return;
       }
@@ -129,7 +107,7 @@ export const runGrokMenu = async (
     const cleanup = () => {
       if (isCleanedUp) return;
       isCleanedUp = true;
-      process.stdout.write('\x1b[?25h');
+      process.stdout.write('\x1b[?25h\x1b[?1049l');
       process.stdout.removeListener('resize', onResize);
       process.stdin.removeListener('data', onData);
       if (process.stdin.isTTY) {
