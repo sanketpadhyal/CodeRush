@@ -4,6 +4,9 @@ import { runGrokMenu } from './ui/menu.js';
 import { showGetStartedScreen } from './screens/get-started.screen.js';
 import { showEnvironmentScreen } from './screens/environment.screen.js';
 import { UserCommand } from './commands/user.command.js';
+import { setTerminalTitle } from './theme/theme.js';
+
+setTerminalTitle('coderush');
 
 const program = new Command();
 const userCommand = new UserCommand();

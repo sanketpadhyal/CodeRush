@@ -1,0 +1,11 @@
+{
+  "terminal.integrated.tabs.title": "${sequence}${process}",
+  "terminal.integrated.defaultProfile.osx": "coderush",
+  "terminal.integrated.profiles.osx": {
+    "coderush": {
+      "path": "zsh",
+      "icon": "zap",
+      "color": "terminal.ansiCyan"
+    }
+  }
+}

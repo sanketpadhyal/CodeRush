@@ -19,6 +19,13 @@ export const theme = {
   error: chalk.hex('#EF4444'),
 };
 
+export const setTerminalTitle = (title: string = 'coderush'): void => {
+  process.title = title;
+  process.stdout.write(`\x1b]0;${title}\x07`);
+  process.stdout.write(`\x1b]2;${title}\x07`);
+  process.stdout.write(`\x1b]633;SetProperty=TaskName=${title}\x07`);
+};
+
 export const getTerminalWidth = (): number => {
   return process.stdout.columns && process.stdout.columns > 20 ? process.stdout.columns : 80;
 };
