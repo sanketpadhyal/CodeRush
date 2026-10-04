@@ -13,12 +13,12 @@ export interface CodeSnippetResponse {
 }
 
 export class ApiService {
-  private readonly baseUrl = process.env.CODERUSH_API_URL || 'http://localhost:5001';
+  private readonly baseUrl = process.env.CODERUSH_API_URL || 'https://backend.coderush.tech';
   private readonly firestore = new FirestoreService();
 
   async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
