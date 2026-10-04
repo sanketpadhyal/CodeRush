@@ -1,10 +1,11 @@
 {
-  "name": "coderush",
+  "name": "coderush-cli",
   "version": "1.0.0",
   "description": "CodeRush Developer Terminal Environment",
   "main": "dist/cli.js",
   "bin": {
-    "coderush": "./dist/cli.js"
+    "coderush": "./dist/cli.js",
+    "coderush-cli": "./dist/cli.js"
   },
   "type": "module",
   "scripts": {
@@ -20,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sanketpadhyal/CodeRush.git"
+    "url": "git+https://github.com/sanketpadhyal/CodeRush.git"
   },
   "keywords": [
     "coderush",
